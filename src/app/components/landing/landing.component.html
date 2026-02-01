@@ -1,0 +1,606 @@
+<div class="mx-3 mt-4">
+    <div class="d-flex justify-content-between">
+        <div class="align-content-center">
+            <h4 style="color: #2f2f2f" class="ps-2 m-0">
+                <span class="pi pi-clipboard fs-4"></span>TaskBuddy
+            </h4>
+        </div>
+        <div>
+            <p-avatar class="pi pi-user" styleClass="mr-2" [style]="{ 'background-color': '#dee9fc', color: '#1a2551' }"
+                shape="circle" />
+            <span class="fs-5 fw-medium ps-2" style="color:#000000">{{username}}</span>
+        </div>
+    </div>
+    <div class="card">
+        <p-toast [breakpoints]="{ '920px': { width: '100%', right: '0', left: '0' } }" />
+        <p-dataview #dv [layout]="layout">
+            <ng-template #header>
+                <div class="d-flex justify-content-between">
+                    <p-selectbutton [options]="viewOptions" [(ngModel)]="layout" optionLabel="label" optionValue="value"
+                        aria-labelledby="basic">
+                        <ng-template let-option pTemplate="item">
+                            <i [class]="option.icon"></i>
+                            <span class="ml-2">{{ option.label }}</span>
+                        </ng-template>
+                    </p-selectbutton>
+                    <p-button label="Logout" variant="outlined" class="logoutBtn" icon="pi pi-sign-out" />
+                </div>
+                <div class="pt-3 d-flex justify-content-between">
+                    <div>
+                        <span>Filter :</span>
+                        <p-select class="categoryDropDown mx-2" [options]="categoryDropDown" optionLabel="name"
+                            optionValue="value" placeholder="Category" size="small" [showClear]="true" />
+                        <p-datepicker class="dueDate mx-2" size="small" [iconDisplay]="'input'" placeholder="Due date"
+                            [showIcon]="true" [showButtonBar]="true" />
+                    </div>
+                    <div class="d-flex flex-wrap">
+                        <p-iconfield class="search mx-1">
+                            <p-inputicon class="pi pi-search" />
+                            <input type="text" pInputText placeholder="Search" />
+                        </p-iconfield>
+                        <p-button class="mx-1 addTaskBtn fw-medium" label="ADD TASK"
+                            (click)="showDialog()" [rounded]="true"></p-button>
+                        <p-dialog header="Create Task" [modal]="true" [(visible)]="addTaskDialogVisible"
+                            (onHide)="clearAllValues()" [style]="{ width: '50vw' }"
+                            [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+                            <div class="mt-3 px-3">
+                                <form [formGroup]="addTask">
+                                    <input type="text" class="w-100 mb-2" placeholder="Task Title" pInputText
+                                        formControlName="taskTitle" />
+                                    <p-editor formControlName="description" placeholder="Description"
+                                        [style]="{ height: '80px' }">
+                                        <ng-template #header>
+                                            <div class="d-flex justify-content-between">
+                                                <div>
+                                                    <span class="ql-formats">
+                                                        <button type="button" class="ql-bold"
+                                                            aria-label="Bold"></button>
+                                                        <button type="button" class="ql-italic"
+                                                            aria-label="Italic"></button>
+                                                        <button type="button" class="ql-strike"
+                                                            aria-label="Strike"></button>
+                                                        <p-divider layout="vertical" />
+                                                    </span>
+                                                    <span class="ql-formats">
+                                                        <button type="button" class="ql-list" value="ordered"
+                                                            aria-label="Ordered List"></button>
+                                                        <button type="button" class="ql-list" value="bullet"
+                                                            aria-label="Bullet List"></button>
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span
+                                                        class="description-length">{{getCharacterCount(addTask.get('description')?.value)}}/300
+                                                        characters</span>
+                                                </div>
+                                            </div>
+                                        </ng-template>
+                                    </p-editor>
+                                    <ng-container *ngIf="addTask.get('description')?.errors?.['maxLengthExceeded']">
+                                        <span class="description-length text-danger">
+                                            Maximum 300 characters allowed!
+                                        </span>
+                                    </ng-container>
+                                    <div class="row my-2">
+                                        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                            <label for="category" class="label">Task Category</label><br>
+                                            <p-selectbutton inputId="category" size="small"
+                                                [options]="categoryDropDown"
+                                                formControlName="category" optionLabel="name"
+                                                aria-labelledby="basic" />
+                                        </div>
+                                        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                            <label for="dueDate" class="label">Due Date</label><br>
+                                            <p-datepicker class="addTaskDueDate" [showButtonBar]="true" appendTo="body"
+                                                placeholder="DD/MM/YYYY" [iconDisplay]="'input'" size="small"
+                                                dateFormat="dd M, yy" formControlName="dueDate" [showIcon]="true"
+                                                inputId="dueDate" />
+                                        </div>
+                                        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                            <label for="status" class="label">Task Status</label><br>
+                                            <p-select class="w-100" [options]="statusDropDown" appendTo="body" size="small"
+                                                formControlName="status" optionLabel="name" placeholder="Choose" />
+                                        </div>
+                                    </div>
+                                    <label class="ms-1">Attachment</label>
+                                    <div class="attachment-section">
+                                        <span>Drop your files here or <label for="upload-btn"
+                                                class="uploadBtn">Upload.</label></span>
+                                        <input type="file" id="upload-btn" (change)="onUpload($event)"
+                                            (click)="clearFile($event)" hidden>
+                                    </div>
+                                    <div *ngIf="addTask.get('documents')?.value.length" class="mt-2 d-flex flex-row flex-wrap gap-3">
+                                        <div class="mt-2" *ngFor="let file of addTask.get('documents')?.value;let i=index">
+                                            <p-overlaybadge badgeSize="small" role="button" severity="danger"
+                                                (click)="deleteDoc(i)" value="&#10005;">
+                                                <img [src]="file.base64Content" alt="doc" width="100" height="135" class="rounded">
+                                            </p-overlaybadge>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <footer class="addTaskFooter text-end mt-2 py-3 px-4">
+                                <p-button size="small" rounded="true" type="button" (onClick)="clearAllValues()"
+                                    class="addTaskCancelBtn">CANCEL</p-button>
+                                <p-button size="small" rounded="true" type="submit" (onClick)="submit()" [disabled]="addTask.invalid"
+                                    class="addTaskCreateBtn">CREATE</p-button>
+                            </footer>
+                        </p-dialog>
+                    </div>
+                </div>
+                <p-divider />
+            </ng-template>
+            <ng-template #list let-items>
+                <p-accordion [value]="['0']" [multiple]="true">
+                    <p-accordion-panel value="0">
+                        <p-accordion-header style="background-color: #FAC3FF;">
+                            <ng-template #toggleicon let-active="active">
+                                @if (active) {
+                                <i class="pi pi-angle-up"></i>
+                                } @else {
+                                <i class="pi pi-angle-down"></i>
+                                }
+                            </ng-template>
+                            <span class="panelHeader">Todo({{todoData.length}})</span>
+                        </p-accordion-header>
+                        <p-accordion-content>
+                            <div class="todoAddTask px-4">
+                                <p-button label="ADD TASK" (click)="showTodoAddTaskFn()" variant="text"
+                                    icon="pi pi-plus" />
+                            </div>
+                            <div *ngIf="todoData.length;else:emptyTodo">
+                                <p-table [value]="todoData" size="small" [columns]="todoCols"
+                                    [reorderableColumns]="true" [tableStyle]="{'min-width': '50rem'}">
+                                    <ng-template #header let-columns>
+                                        <tr>
+                                            <th style="width: 2rem">
+                                                <p-tableHeaderCheckbox />
+                                            </th>
+                                            <th style="width: 2rem" pReorderableColumn></th>
+                                            <th style="min-width:12rem">
+                                                Task Name
+                                            </th>
+                                            <th pSortableColumn="dueDate" style="min-width: 6rem">
+                                                Due on
+                                                <p-sortIcon field="dueDate" />
+                                            </th>
+                                            <th style="min-width: 10rem">
+                                                Task Status
+                                            </th>
+                                            <th style="min-width:10rem">
+                                                Task Category
+                                            </th>
+                                            <th style="min-width: 2rem"></th>
+                                        </tr>
+                                        <tr *ngIf="showTodoAddTask" [formGroup]="addTask" class="addTaskRow">
+                                            <th></th>
+                                            <th></th>
+                                            <th>
+                                                <input type="text" class="smallTaskTitle" pInputText
+                                                    formControlName="taskTitle" placeholder="Task Title" />
+                                            </th>
+                                            <th>
+                                                <p-datepicker formControlName="dueDate" class="addDate"
+                                                    dateFormat="dd M, yy" showButtonBar="true" size="small"
+                                                    placeholder="Add Date" appendTo="body" />
+                                                <!-- <p-inplace>
+                                                    <ng-template #display>
+                                                        <p-button label="Add Date" class="addDateBtn"
+                                                            icon="pi pi-calendar" rounded="true" size="small"
+                                                            variant="outlined" (click)="showDatePicker()"></p-button>
+                                                        <input type="date" #dateInput class="hidden-date-input"
+                                                            formControlName="date">
+                                                    </ng-template>
+                                                    <ng-template #content let-closeCallback="closeCallback">
+                                                        <span class="inline-flex items-center gap-2">
+                                                            <p-chip [label]="addTask.get('date')?.value"
+                                                                styleClass="background-color: #d1fae5;"
+                                                                [removable]="true"
+                                                                (click)="closeCallback($event); clearFormControlValue(addTask.get('date'))" />
+                                                        </span>
+                                                    </ng-template>
+                                                </p-inplace> -->
+                                            </th>
+                                            <th>
+                                                <p-inplace>
+                                                    <ng-template #display>
+                                                        <p-button (click)="openStatusList($event)" size="small"
+                                                            icon="pi pi-plus" class="openListBtn" [rounded]="true"
+                                                            [outlined]="true" />
+                                                        <p-listbox *ngIf="isStatusListOpened && isListBoxVisible"
+                                                            [options]="statusDropDown" formControlName="status"
+                                                            [checkmark]="true" [highlightOnSelect]="false"
+                                                            optionLabel="name" />
+                                                    </ng-template>
+                                                    <ng-template #content let-closeCallback="closeCallback">
+                                                        <span class="inline-flex items-center gap-2">
+                                                            <p-chip [label]="addTask.get('status')?.value.name"
+                                                                styleClass="background-color: #d1fae5;"
+                                                                [removable]="true"
+                                                                (click)="closeCallback($event)" />
+                                                        </span>
+                                                        <ng-container *ngIf="storeStatusCloseCallback(closeCallback)"></ng-container>
+                                                    </ng-template>
+                                                </p-inplace>
+                                            </th>
+                                            <th>
+                                                <p-inplace>
+                                                    <ng-template #display>
+                                                        <p-button (click)="openCategoryList($event)" size="small"
+                                                            class="openListBtn" icon="pi pi-plus" [rounded]="true"
+                                                            [outlined]="true" />
+                                                        <p-listbox *ngIf="isCategoryListOpened && isListBoxVisible"
+                                                            [options]="categoryDropDown" formControlName="category"
+                                                            [checkmark]="true" [highlightOnSelect]="false"
+                                                            optionLabel="name" />
+                                                    </ng-template>
+                                                    <ng-template #content let-closeCallback="closeCallback">
+                                                        <span class="inline-flex items-center gap-2">
+                                                            <p-chip [label]="addTask.get('category')?.value.name"
+                                                                styleClass="background-color: #d1fae5;"
+                                                                [removable]="true"
+                                                                (click)="closeCallback($event)" />
+                                                        </span>
+                                                        <ng-container *ngIf="storeCategoryCloseCallback(closeCallback)"></ng-container>
+                                                    </ng-template>
+                                                </p-inplace>
+                                            </th>
+                                            <th></th>
+                                        </tr>
+                                        <tr *ngIf="showTodoAddTask">
+                                            <th></th>
+                                            <th></th>
+                                            <th>
+                                                <p-button class="smallAddTaskBtn me-2" label="ADD" size="small"
+                                                    icon="pi pi-reply" iconPos="right" [rounded]="true"
+                                                     [disabled]="addTask.invalid" (onClick)="submit()" />
+                                                <p-button label="CANCEL" size="small" (onClick)="clearAllValues()" rounded="true" variant="text" />
+                                            </th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template #body let-rowData let-columns="columns" let-index="rowIndex">
+                                        <tr [pReorderableRow]="index">
+                                            <td style="width: 3rem">
+                                                <p-tableCheckbox [value]="rowData" />
+                                            </td>
+                                            <td>
+                                                <span class="pi pi-bars" pReorderableRowHandle></span>
+                                            </td>
+                                            <td style="min-width: 16rem">{{ rowData.taskTitle }}</td>
+                                            <td style="min-width: 12rem">{{ rowData.dueDate | date : 'dd MMM, yyyy'}}
+                                            </td>
+                                            <td style="min-width: 12rem"> <p-tag [value]="rowData.mstStatus.name" /> </td>
+                                            <td>{{ rowData.mstCategory.name }}</td>
+                                            <td>
+                                                <p-menu #todoMenu [model]="editMenuItems" [popup]="true" appendTo="body" />
+                                                <p-button (click)="openMenu($event, rowData, todoMenu)" variant="text" rounded="true"
+                                                    icon="pi pi-ellipsis-v" />
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                            </div>
+
+                            <ng-template #emptyTodo>
+                                <p class="text-center p-5">No Tasks in To-Do</p>
+                            </ng-template>
+                        </p-accordion-content>
+                    </p-accordion-panel>
+                    <p-accordion-panel value="1">
+                        <p-accordion-header style="background-color: #85D9F1;">
+                            <ng-template #toggleicon let-active="active">
+                                @if (active) {
+                                <i class="pi pi-angle-up"></i>
+                                } @else {
+                                <i class="pi pi-angle-down"></i>
+                                }
+                            </ng-template>
+                            <span class="panelHeader">In-Progress({{inProgressData.length}})</span>
+                        </p-accordion-header>
+                        <p-accordion-content>
+                            <div *ngIf="inProgressData.length;else:emptyInProgress">
+                                <p-table [value]="inProgressData" size="small" [columns]="todoCols"
+                                    [reorderableColumns]="true" [tableStyle]="{'min-width': '50rem'}">
+                                    <ng-template #header let-columns>
+                                        <tr>
+                                            <th style="width: 2rem">
+                                                <p-tableHeaderCheckbox />
+                                            </th>
+                                            <th style="width: 2rem" pReorderableColumn></th>
+                                            <th style="min-width:12rem">
+                                                Task Name
+                                            </th>
+                                            <th pSortableColumn="dueDate" style="min-width: 6rem">
+                                                Due on
+                                                <p-sortIcon field="dueDate" />
+                                            </th>
+                                            <th style="min-width: 10rem">
+                                                Task Status
+                                            </th>
+                                            <th style="min-width:10rem">
+                                                Task Category
+                                            </th>
+                                            <th style="min-width: 2rem"></th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template #body let-rowData let-columns="columns" let-index="rowIndex">
+                                        <tr [pReorderableRow]="index">
+                                            <td style="width: 3rem">
+                                                <p-tableCheckbox [value]="rowData" />
+                                            </td>
+                                            <td>
+                                                <span class="pi pi-bars" pReorderableRowHandle></span>
+                                            </td>
+                                            <td style="min-width: 16rem">{{ rowData.taskTitle }}</td>
+                                            <td style="min-width: 12rem">{{ rowData.dueDate | date : 'dd MMM, yyyy'}}
+                                            </td>
+                                            <td style="min-width: 12rem"> <p-tag [value]="rowData.mstStatus.name" /> </td>
+                                            <td>{{ rowData.mstCategory.name }}</td>
+                                            <td>
+                                                <p-menu #inProgressMenu [model]="editMenuItems" [popup]="true" appendTo="body" />
+                                                <p-button (click)="openMenu($event, rowData, inProgressMenu)" variant="text"
+                                                    icon="pi pi-ellipsis-v" />
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                            </div>
+                            <ng-template #emptyInProgress>
+                                <p class="text-center p-5">No Tasks in Progress</p>
+                            </ng-template>
+                        </p-accordion-content>
+                    </p-accordion-panel>
+                    <p-accordion-panel value="2">
+                        <p-accordion-header style="background-color: #CEFFCC;">
+                            <ng-template #toggleicon let-active="active">
+                                @if (active) {
+                                <i class="pi pi-angle-up"></i>
+                                } @else {
+                                <i class="pi pi-angle-down"></i>
+                                }
+                            </ng-template>
+                            <span class="panelHeader">Completed({{completedData.length}})</span>
+                        </p-accordion-header>
+                        <p-accordion-content>
+                            <div *ngIf="completedData.length;else:emptyInProgress">
+                                <p-table [value]="completedData" size="small" [columns]="todoCols"
+                                    [reorderableColumns]="true" [tableStyle]="{'min-width': '50rem'}">
+                                    <ng-template #header let-columns>
+                                        <tr>
+                                            <th style="width: 2rem">
+                                                <p-tableHeaderCheckbox />
+                                            </th>
+                                            <th style="width: 2rem" pReorderableColumn></th>
+                                            <th style="min-width:12rem">
+                                                Task Name
+                                            </th>
+                                            <th pSortableColumn="dueDate" style="min-width: 6rem">
+                                                Due on
+                                                <p-sortIcon field="dueDate" />
+                                            </th>
+                                            <th style="min-width: 10rem">
+                                                Task Status
+                                            </th>
+                                            <th style="min-width:10rem">
+                                                Task Category
+                                            </th>
+                                            <th style="min-width: 2rem"></th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template #body let-rowData let-columns="columns" let-index="rowIndex">
+                                        <tr [pReorderableRow]="index">
+                                            <td style="width: 3rem">
+                                                <p-tableCheckbox [value]="rowData" />
+                                            </td>
+                                            <td>
+                                                <span class="pi pi-bars" pReorderableRowHandle></span>
+                                            </td>
+                                            <td style="min-width: 16rem">{{ rowData.taskTitle }}</td>
+                                            <td style="min-width: 12rem">{{ rowData.dueDate | date : 'dd MMM, yyyy'}}
+                                            </td>
+                                            <td style="min-width: 12rem"> <p-tag [value]="rowData.mstStatus.name" /> </td>
+                                            <td>{{ rowData.mstCategory.name }}</td>
+                                            <td>
+                                                <p-menu #completedMenu [model]="editMenuItems" [popup]="true" appendTo="body" />
+                                                <p-button (click)="openMenu($event, rowData, completedMenu)" variant="text"
+                                                    icon="pi pi-ellipsis-v" />
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                            </div>
+                            <ng-template #emptyCompleted>
+                                <p class="text-center p-5">No Tasks in Completed</p>
+                            </ng-template>
+                        </p-accordion-content>
+                    </p-accordion-panel>
+                </p-accordion>
+            </ng-template>
+            <ng-template #grid let-items>
+                <div class="board-view d-flex justify-content-between pb-2">
+                    <div class="board-card">
+                        <div class="ms-2 mt-2 mb-2">
+                            <p-tag value="TO-DO" class="todoTag" />
+                        </div>
+                        <div *ngIf="todoData.length;else:boardEmptyTodo" class="example-list mx-2" cdkDropList
+                            (cdkDropListDropped)="drop(todoData, $event)">
+                            <ng-container *ngFor="let item of todoData">
+                                <p-panel class="example-box mb-2" cdkDrag>
+                                    <ng-template #header>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold">{{item.taskTitle}}</span>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #footer>
+                                        <div class="d-flex justify-content-between">
+                                            <p>{{item.mstCategory.name}}</p>
+                                            <p class="text-surface-500 dark:text-surface-400">{{item.dueDate | date:'dd MMM, yyyy'}}</p>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #icons>
+                                        <p-button icon="pi pi-ellipsis-h" severity="secondary" rounded text
+                                            (click)="openMenu($event, item, todoBoardMenu)" />
+                                        <p-menu #todoBoardMenu id="config_menu" [model]="editMenuItems" appendTo="body"
+                                            [popup]="true" />
+                                    </ng-template>
+                                </p-panel>
+                            </ng-container>
+                        </div>
+                        <ng-template #boardEmptyTodo class="text-center p-5">No Tasks in To-Do</ng-template>
+                    </div>
+                    <div class="board-card">
+                        <div class="ms-2 mt-2 mb-2">
+                            <p-tag value="IN-PROGRESS" class="inProgressTag" />
+                        </div>
+                        <div *ngIf="inProgressData.length;else:boardEmptyInProgress" class="board-tasks mx-2">
+                            <ng-container *ngFor="let item of inProgressData">
+                                <p-panel>
+                                    <ng-template #header>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold">{{item.taskTitle}}</span>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #footer>
+                                        <div class="d-flex justify-content-between">
+                                            <p>{{item.mstCategory.name}}</p>
+                                            <p class="text-surface-500 dark:text-surface-400">{{item.dueDate | date:'dd MMM, yyyy'}}</p>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #icons>
+                                        <p-button icon="pi pi-ellipsis-h" severity="secondary" rounded text
+                                            (click)="openMenu($event, item, inProgressBoardMenu)" />
+                                        <p-menu #inProgressBoardMenu id="config_menu" [model]="editMenuItems" appendTo="body"
+                                            [popup]="true" />
+                                    </ng-template>
+                                </p-panel>
+                            </ng-container>
+                        </div>
+                        <ng-template #boardEmptyInProgress>
+                            <div class="text-center p-5">
+                                No Tasks in Progress
+                            </div>
+                        </ng-template>
+                    </div>
+                    <div class="board-card">
+                        <div class="ms-2 mt-2 mb-2">
+                            <p-tag value="COMPLETED" class="completedTag" />
+                        </div>
+                        <div *ngIf="completedData.length;else:boardEmptyCompleted" class="board-tasks mx-2">
+                            <ng-container *ngFor="let item of completedData">
+                                <p-panel>
+                                    <ng-template #header>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold">{{item.taskTitle}}</span>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #footer>
+                                        <div class="d-flex justify-content-between">
+                                            <p>{{item.mstCategory.name}}</p>
+                                            <p class="text-surface-500 dark:text-surface-400">{{item.dueDate | date:'dd MMM, yyyy'}}</p>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #icons>
+                                        <p-button icon="pi pi-ellipsis-h" severity="secondary" rounded text
+                                            (click)="openMenu($event, item, completedBoardMenu)" />
+                                        <p-menu #completedBoardMenu id="config_menu" [model]="editMenuItems" appendTo="body"
+                                            [popup]="true" />
+                                    </ng-template>
+                                </p-panel>
+                            </ng-container>
+                        </div>
+                        <ng-template #boardEmptyCompleted>
+                            <div class="text-center p-5">
+                                No Tasks in Completed
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+            </ng-template>
+        </p-dataview>
+    </div>
+</div>
+
+<!--  ----  DIALOG FOR EDIT  ----  -->
+<p-dialog header="Edit Task" [modal]="true" [(visible)]="editTaskDialogVisible" (onHide)="clearAllValues()"
+    [style]="{ width: '75vw' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <div class="row mt-3 mx-2">
+        <form [formGroup]="addTask" class="col-12 col-sm-12 col-md-8 col-lg-8">
+            <input type="text" class="w-100 mb-2" placeholder="Task Title" pInputText formControlName="taskTitle" />
+            <p-editor formControlName="description" placeholder="Description" [style]="{ height: '80px' }">
+                <ng-template #header>
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <span class="ql-formats">
+                                <button type="button" class="ql-bold" aria-label="Bold"></button>
+                                <button type="button" class="ql-italic" aria-label="Italic"></button>
+                                <button type="button" class="ql-strike" aria-label="Strike"></button>
+                                <p-divider layout="vertical" />
+                            </span>
+                            <span class="ql-formats">
+                                <button type="button" class="ql-list" value="ordered"
+                                    aria-label="Ordered List"></button>
+                                <button type="button" class="ql-list" value="bullet" aria-label="Bullet List"></button>
+                            </span>
+                        </div>
+                        <div>
+                            <span
+                                class="description-length">{{getCharacterCount(addTask.get('description')?.value)}}/300
+                                characters</span>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-editor>
+            <ng-container *ngIf="addTask.get('description')?.errors?.['maxLengthExceeded']">
+                <span class="description-length text-danger">
+                    Maximum 300 characters allowed!
+                </span>
+            </ng-container>
+            <div class="row my-2">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <label for="category" class="label">Task Category</label><br>
+                    <p-selectbutton inputId="category" size="small"
+                        [options]="categoryDropDown"
+                        formControlName="category" optionLabel="name" aria-labelledby="basic" />
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <label for="dueDate" class="label">Due Date</label><br>
+                    <p-datepicker class="addTaskDueDate" [showButtonBar]="true" appendTo="body" placeholder="DD/MM/YYYY"
+                        [iconDisplay]="'input'" size="small" dateFormat="dd M, yy" formControlName="dueDate"
+                        [showIcon]="true" inputId="dueDate" />
+
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <label for="status" class="label">Task Status</label><br>
+                    <p-select class="w-100" [options]="statusDropDown" size="small"
+                        formControlName="status" optionLabel="name" placeholder="Choose" />
+                </div>
+            </div>
+            <label class="ms-1">Attachment</label>
+            <div class="attachment-section">
+                <span>Drop your files here or <label for="upload-btn" class="uploadBtn">Upload.</label></span>
+                <input type="file" id="upload-btn" (change)="onUpload($event)" (click)="clearFile($event)" hidden>
+            </div>
+            <div *ngIf="addTask.get('documents')?.value.length" class="mt-2 d-flex flex-row flex-wrap gap-3">
+                <div class="mt-2" *ngFor="let file of addTask.get('documents')?.value;let i=index">
+                    <p-overlaybadge badgeSize="small" role="button" severity="danger" (click)="deleteDoc(i)"
+                        value="&#10005;">
+                        <img [src]="file.base64Content" alt="doc" width="100" height="135" class="rounded">
+                    </p-overlaybadge>
+                </div>
+            </div>
+        </form>
+        <div class="activity-section col-12 col-sm-12 col-md-4 col-lg-4">
+            <p class="activity-heading">Activity</p>
+        </div>
+    </div>
+    <footer class="addTaskFooter text-end mt-2 py-3 px-4">
+        <p-button size="small" rounded="true"  (onClick)="clearAllValues()"
+            class="addTaskCancelBtn">CANCEL</p-button>
+        <p-button size="small" rounded="true"  (onClick)="submit()"
+            class="addTaskCreateBtn">UPDATE</p-button>
+    </footer>
+</p-dialog>

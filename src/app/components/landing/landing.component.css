@@ -1,0 +1,331 @@
+.card {
+    border: none !important;
+}
+
+::ng-deep .p-dataview-header {
+    border-bottom: none !important;
+    padding-left: 5px;
+    padding-right: 0px
+}
+
+::ng-deep .pi-sign-out {
+    rotate: y -180deg;
+}
+
+::ng-deep .logoutBtn .p-button {
+    border-radius: 12px !important;
+    width: 100% !important;
+}
+
+::ng-deep .categoryDropDown {
+    border-radius: 20px !important;
+}
+
+::ng-deep .dueDate .p-datepicker-input,
+.search input.p-inputtext {
+    border-radius: 20px !important;
+}
+
+::ng-deep .addTaskBtn .p-button-rounded {
+    background-color: #7B1984;
+}
+
+::ng-deep .p-dataview-emptymessage {
+    display: none !important;
+}
+
+::ng-deep .p-dataview-footer {
+    display: none !important;
+}
+
+::ng-deep .p-accordioncontent-content {
+    padding: 0px !important;
+    background-color: #F1F1F1 !important;
+    border-bottom-right-radius: 10px !important;
+    border-bottom-left-radius: 10px !important;
+    border-bottom-right-radius: 10px !important;
+    border-bottom-left-radius: 10px !important;
+}
+
+.panelHeader {
+    color: black;
+}
+
+.todoAddTask {
+    border-bottom: 1px solid #dee2e6;
+}
+
+::ng-deep .p-accordionpanel {
+    margin-bottom: 2rem !important;
+    border: none !important;
+    border-radius: 5px !important;
+}
+
+::ng-deep .p-accordionheader {
+    border-top-right-radius: 10px !important;
+    border-top-left-radius: 10px !important;
+    border-bottom-right-radius: 10px !important;
+    border-bottom-left-radius: 10px !important;
+}
+
+::ng-deep .p-accordionpanel-active>.p-accordionheader {
+    border-bottom-right-radius: 0px !important;
+    border-bottom-left-radius: 0px !important;
+}
+
+::ng-deep .deleteMenuItem .p-menu-item-link,
+::ng-deep .pi-trash {
+    color: red !important;
+}
+
+::ng-deep .pi-reply {
+    transform: rotate(180deg);
+}
+
+::ng-deep .smallAddTaskBtn .p-button-rounded {
+    /* padding: 5px 15px !important; */
+    background-color: #7B1984 !important;
+}
+
+::ng-deep .p-datatable-table-container {
+    border-bottom-right-radius: 10px !important;
+    border-bottom-left-radius: 10px !important;
+}
+
+table,
+td,
+th,
+tr {
+    background-color: #F1F1F1 !important;
+}
+
+.addTaskRow tr,
+.addTaskRow th {
+    border: none !important;
+}
+
+.hidden-date-input {
+    opacity: 0;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.smallTaskTitle {
+    border: none;
+    background-color: inherit;
+    box-shadow: none;
+}
+
+::ng-deep .p-listbox {
+    display: inline-flex !important;
+    position: absolute;
+    z-index: 9999 !important;
+}
+
+::ng-deep .addDate .p-datepicker-input {
+    background-color: inherit !important;
+    width: 8rem !important;
+    /* border: none !important; */
+    border-radius: 25px !important;
+    box-shadow: none !important;
+}
+
+::ng-deep .p-inplace-display:hover {
+    background-color: inherit !important;
+}
+
+.board-card {
+    background-color: #F1F1F1;
+    border-radius: 10px;
+    width: 33%;
+    height: 100vh;
+    overflow: scroll;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+}
+
+.board-card:hover {
+    scrollbar-width: thin;
+    scroll-behavior: smooth;
+}
+
+::ng-deep .board-tasks .p-panel {
+    margin-bottom: 0.5rem !important;
+}
+
+::ng-deep .p-panel {
+    border-radius: 15px !important;
+    width: 100% !important;
+}
+
+::ng-deep .p-panel-footer {
+    padding-bottom: 0px !important;
+}
+
+.todoTag {
+    background-color: #FAC3FF;
+    color: black;
+}
+
+.inProgressTag {
+    background-color: #85D9F1;
+    color: black;
+}
+
+.completedTag {
+    background-color: #CEFFCC;
+    color: black;
+}
+::ng-deep .p-dialog-content{
+    padding: 0px !important;
+}
+::ng-deep .p-dialog-header {
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+::ng-deep .ql-formats .p-divider-vertical {
+    padding: 4px 0px !important;
+}
+
+::ng-deep .p-editor-container {
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    /* border: 1px solid #cbd5e1; */
+}
+
+::ng-deep .p-editor .p-editor-content .ql-editor {
+    background-color: inherit !important;
+    /* border-bottom: none !important; */
+}
+
+::ng-deep .p-editor .p-editor-content.ql-snow {
+    border: 1px solid #cbd5e1 !important;
+    border-bottom: none !important;
+}
+
+::ng-deep .ql-toolbar.ql-snow .ql-formats {
+    margin-inline-end: 0px !important;
+}
+
+::ng-deep .p-editor .p-editor-toolbar {
+    border: 1px solid #cbd5e1 !important;
+    border-top: none !important;
+    border-top-right-radius: 0px !important;
+    border-top-left-radius: 0px !important;
+    border-bottom-right-radius: 5px !important;
+    border-bottom-left-radius: 5px !important;
+}
+
+::ng-deep .p-editor .p-editor-content {
+    /* border-color: #cbd5e1; */
+    border-bottom: none !important;
+    border-top-right-radius: 5px !important;
+    border-top-left-radius: 5px !important;
+    border-bottom-right-radius: 0px !important;
+    border-bottom-left-radius: 0px !important;
+}
+
+.description-length {
+    font-size: small;
+    color: #cbd5e1;
+}
+
+::ng-deep .p-datepicker:has(.p-datepicker-input-icon-container) .p-datepicker-input {
+    padding-inline-end: 0px !important;
+}
+
+.label {
+    padding-bottom: 0.5rem;
+    font-size: small;
+}
+
+.uploadBtn {
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.attachment-section {
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+}
+
+.addTaskFooter{
+    background-color: #F1F1F1;
+    border-bottom-right-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+::ng-deep .addTaskCancelBtn .p-button{
+    color: black;
+    background-color: white !important;
+    border: 1px solid #ccc !important;
+    padding: 7px 20px;
+    margin-right: 1rem;
+}
+::ng-deep .addTaskCreateBtn .p-button{
+    padding: 7px 20px;
+}
+::ng-deep .addTaskCancelBtn .p-button:hover{
+    color: inherit !important;
+    background-color: inherit !important;
+}
+
+.activity-section{
+    background-color: #F1F1F1;
+    border-radius: 5px;
+}
+.activity-heading{
+    font-size: 20px;
+    font-weight: 500;
+}
+
+/* ::ng-deep .addDateBtn .p-button , ::ng-deep .openListBtn .p-button{
+    color: #334155 !important;
+    border-color: #334155 !important;
+} */
+
+
+/* ---- Board Drag Styles ---- */
+.example-list {
+    display: block;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.example-box {
+    color: rgba(0, 0, 0, 0.87);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    cursor: move;
+}
+
+.cdk-drag-preview {
+    border: none;
+    box-sizing: border-box;
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+        0 8px 10px 1px rgba(0, 0, 0, 0.14),
+        0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+    opacity: 0;
+}
+
+.cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.example-box:last-child {
+    border: none;
+}
+
+.example-list.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
