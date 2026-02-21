@@ -38,15 +38,15 @@
                             <p-inputicon class="pi pi-search" />
                             <input type="text" pInputText placeholder="Search" />
                         </p-iconfield>
-                        <p-button class="mx-1 addTaskBtn fw-medium" label="ADD TASK"
-                            (click)="showDialog()" [rounded]="true"></p-button>
+                        <p-button class="mx-1 addTaskBtn fw-medium" label="ADD TASK" (click)="showDialog()"
+                            [rounded]="true"></p-button>
                         <p-dialog header="Create Task" [modal]="true" [(visible)]="addTaskDialogVisible"
                             (onHide)="clearAllValues()" [style]="{ width: '50vw' }"
                             [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
                             <div class="mt-3 px-3">
                                 <form [formGroup]="addTask">
                                     <input type="text" class="w-100 mb-2" placeholder="Task Title" pInputText
-                                        formControlName="taskTitle" />
+                                        formControlName="title" />
                                     <p-editor formControlName="description" placeholder="Description"
                                         [style]="{ height: '80px' }">
                                         <ng-template #header>
@@ -84,10 +84,8 @@
                                     <div class="row my-2">
                                         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                                             <label for="category" class="label">Task Category</label><br>
-                                            <p-selectbutton inputId="category" size="small"
-                                                [options]="categoryDropDown"
-                                                formControlName="category" optionLabel="name"
-                                                aria-labelledby="basic" />
+                                            <p-selectbutton inputId="category" size="small" [options]="categoryDropDown"
+                                                formControlName="category" optionLabel="name" aria-labelledby="basic" />
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                                             <label for="dueDate" class="label">Due Date</label><br>
@@ -98,8 +96,9 @@
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                                             <label for="status" class="label">Task Status</label><br>
-                                            <p-select class="w-100" [options]="statusDropDown" appendTo="body" size="small"
-                                                formControlName="status" optionLabel="name" placeholder="Choose" />
+                                            <p-select class="w-100" [options]="statusDropDown" appendTo="body"
+                                                size="small" formControlName="status" optionLabel="name"
+                                                placeholder="Choose" />
                                         </div>
                                     </div>
                                     <label class="ms-1">Attachment</label>
@@ -109,11 +108,14 @@
                                         <input type="file" id="upload-btn" (change)="onUpload($event)"
                                             (click)="clearFile($event)" hidden>
                                     </div>
-                                    <div *ngIf="addTask.get('documents')?.value.length" class="mt-2 d-flex flex-row flex-wrap gap-3">
-                                        <div class="mt-2" *ngFor="let file of addTask.get('documents')?.value;let i=index">
+                                    <div *ngIf="addTask.get('documents')?.value.length"
+                                        class="mt-2 d-flex flex-row flex-wrap gap-3">
+                                        <div class="mt-2"
+                                            *ngFor="let file of addTask.get('documents')?.value;let i=index">
                                             <p-overlaybadge badgeSize="small" role="button" severity="danger"
                                                 (click)="deleteDoc(i)" value="&#10005;">
-                                                <img [src]="file.base64Content" alt="doc" width="100" height="135" class="rounded">
+                                                <img [src]="file.base64Content" alt="doc" width="100" height="135"
+                                                    class="rounded">
                                             </p-overlaybadge>
                                         </div>
                                     </div>
@@ -122,8 +124,8 @@
                             <footer class="addTaskFooter text-end mt-2 py-3 px-4">
                                 <p-button size="small" rounded="true" type="button" (onClick)="clearAllValues()"
                                     class="addTaskCancelBtn">CANCEL</p-button>
-                                <p-button size="small" rounded="true" type="submit" (onClick)="submit()" [disabled]="addTask.invalid"
-                                    class="addTaskCreateBtn">CREATE</p-button>
+                                <p-button size="small" rounded="true" type="submit" (onClick)="submit('save')"
+                                    [disabled]="addTask.invalid" class="addTaskCreateBtn">CREATE</p-button>
                             </footer>
                         </p-dialog>
                     </div>
@@ -148,9 +150,10 @@
                                 <p-button label="ADD TASK" (click)="showTodoAddTaskFn()" variant="text"
                                     icon="pi pi-plus" />
                             </div>
-                            <div *ngIf="todoData.length;else:emptyTodo">
+                            <div *ngIf="todoData.length || showTodoAddTask;else:emptyTodo">
                                 <p-table [value]="todoData" size="small" [columns]="todoCols"
-                                    [reorderableColumns]="true" [tableStyle]="{'min-width': '50rem'}">
+                                    [reorderableColumns]="true" [tableStyle]="{'min-width': '50rem'}"
+                                    selectionMode="multiple" [(selection)]="selectedRows">
                                     <ng-template #header let-columns>
                                         <tr>
                                             <th style="width: 2rem">
@@ -177,7 +180,7 @@
                                             <th></th>
                                             <th>
                                                 <input type="text" class="smallTaskTitle" pInputText
-                                                    formControlName="taskTitle" placeholder="Task Title" />
+                                                    formControlName="title" placeholder="Task Title" />
                                             </th>
                                             <th>
                                                 <p-datepicker formControlName="dueDate" class="addDate"
@@ -202,48 +205,38 @@
                                                 </p-inplace> -->
                                             </th>
                                             <th>
-                                                <p-inplace>
-                                                    <ng-template #display>
-                                                        <p-button (click)="openStatusList($event)" size="small"
-                                                            icon="pi pi-plus" class="openListBtn" [rounded]="true"
-                                                            [outlined]="true" />
-                                                        <p-listbox *ngIf="isStatusListOpened && isListBoxVisible"
-                                                            [options]="statusDropDown" formControlName="status"
-                                                            [checkmark]="true" [highlightOnSelect]="false"
-                                                            optionLabel="name" />
-                                                    </ng-template>
-                                                    <ng-template #content let-closeCallback="closeCallback">
-                                                        <span class="inline-flex items-center gap-2">
-                                                            <p-chip [label]="addTask.get('status')?.value.name"
-                                                                styleClass="background-color: #d1fae5;"
-                                                                [removable]="true"
-                                                                (click)="closeCallback($event)" />
-                                                        </span>
-                                                        <ng-container *ngIf="storeStatusCloseCallback(closeCallback)"></ng-container>
-                                                    </ng-template>
-                                                </p-inplace>
+                                                @if (isStatusSelected == false) {
+                                                <ng-container>
+                                                    <p-menu #statusCategory [model]="taskStatusMenuItems" [popup]="true"
+                                                        appendTo="body" />
+                                                    <p-button class="ms-1" (click)="statusCategory.toggle($event)"
+                                                        [rounded]="true" [outlined]="true" icon="pi pi-plus" />
+                                                </ng-container>
+                                                }
+                                                @else{
+                                                <ng-container>
+                                                    <p-chip [label]="addTask.get('status')?.value.name"
+                                                        styleClass="background-color: #d1fae5;" [removable]="true"
+                                                        (click)="clearStatus()" />
+                                                </ng-container>
+                                                }
                                             </th>
                                             <th>
-                                                <p-inplace>
-                                                    <ng-template #display>
-                                                        <p-button (click)="openCategoryList($event)" size="small"
-                                                            class="openListBtn" icon="pi pi-plus" [rounded]="true"
-                                                            [outlined]="true" />
-                                                        <p-listbox *ngIf="isCategoryListOpened && isListBoxVisible"
-                                                            [options]="categoryDropDown" formControlName="category"
-                                                            [checkmark]="true" [highlightOnSelect]="false"
-                                                            optionLabel="name" />
-                                                    </ng-template>
-                                                    <ng-template #content let-closeCallback="closeCallback">
-                                                        <span class="inline-flex items-center gap-2">
-                                                            <p-chip [label]="addTask.get('category')?.value.name"
-                                                                styleClass="background-color: #d1fae5;"
-                                                                [removable]="true"
-                                                                (click)="closeCallback($event)" />
-                                                        </span>
-                                                        <ng-container *ngIf="storeCategoryCloseCallback(closeCallback)"></ng-container>
-                                                    </ng-template>
-                                                </p-inplace>
+                                                @if (isCategorySelected == false) {
+                                                <ng-container>
+                                                    <p-menu #categoryMenu [model]="taskCategoryMenuItems" [popup]="true"
+                                                        appendTo="body" />
+                                                    <p-button class="ms-1" (click)="categoryMenu.toggle($event)"
+                                                        [rounded]="true" [outlined]="true" icon="pi pi-plus" />
+                                                </ng-container>
+                                                }
+                                                @else{
+                                                <ng-container>
+                                                    <p-chip [label]="addTask.get('category')?.value.name"
+                                                        styleClass="background-color: #d1fae5;" [removable]="true"
+                                                        (click)="clearCategory()" />
+                                                </ng-container>
+                                                }
                                             </th>
                                             <th></th>
                                         </tr>
@@ -253,8 +246,9 @@
                                             <th>
                                                 <p-button class="smallAddTaskBtn me-2" label="ADD" size="small"
                                                     icon="pi pi-reply" iconPos="right" [rounded]="true"
-                                                     [disabled]="addTask.invalid" (onClick)="submit()" />
-                                                <p-button label="CANCEL" size="small" (onClick)="clearAllValues()" rounded="true" variant="text" />
+                                                    [disabled]="addTask.invalid" (onClick)="submit('save')" />
+                                                <p-button label="CANCEL" size="small" (onClick)="clearAllValues()"
+                                                    rounded="true" variant="text" />
                                             </th>
                                             <th></th>
                                             <th></th>
@@ -270,15 +264,22 @@
                                             <td>
                                                 <span class="pi pi-bars" pReorderableRowHandle></span>
                                             </td>
-                                            <td style="min-width: 16rem">{{ rowData.taskTitle }}</td>
+                                            <td style="min-width: 16rem">{{ rowData.title }}</td>
                                             <td style="min-width: 12rem">{{ rowData.dueDate | date : 'dd MMM, yyyy'}}
                                             </td>
-                                            <td style="min-width: 12rem"> <p-tag [value]="rowData.mstStatus.name" /> </td>
-                                            <td>{{ rowData.mstCategory.name }}</td>
+                                            <td style="min-width: 12rem"> <p-menu #todoStatusUpdateMenu
+                                                    [model]="taskStatusUpdateMenuItems" [popup]="true"
+                                                    appendTo="body" />
+                                                <p-button (click)="openMenu($event, rowData, todoStatusUpdateMenu)"
+                                                    variant="text" [label]="rowData.status" size="small"
+                                                    class="statusBtnInTable" />
+                                            </td>
+                                            <td>{{ rowData.category }}</td>
                                             <td>
-                                                <p-menu #todoMenu [model]="editMenuItems" [popup]="true" appendTo="body" />
-                                                <p-button (click)="openMenu($event, rowData, todoMenu)" variant="text" rounded="true"
-                                                    icon="pi pi-ellipsis-v" />
+                                                <p-menu #todoMenu [model]="editMenuItems" [popup]="true"
+                                                    appendTo="body" />
+                                                <p-button (click)="openMenu($event, rowData, todoMenu)" variant="text"
+                                                    rounded="true" icon="pi pi-ellipsis-v" />
                                             </td>
                                         </tr>
                                     </ng-template>
@@ -304,7 +305,8 @@
                         <p-accordion-content>
                             <div *ngIf="inProgressData.length;else:emptyInProgress">
                                 <p-table [value]="inProgressData" size="small" [columns]="todoCols"
-                                    [reorderableColumns]="true" [tableStyle]="{'min-width': '50rem'}">
+                                    [reorderableColumns]="true" [tableStyle]="{'min-width': '50rem'}"
+                                    [(selection)]="selectedRows">
                                     <ng-template #header let-columns>
                                         <tr>
                                             <th style="width: 2rem">
@@ -335,15 +337,23 @@
                                             <td>
                                                 <span class="pi pi-bars" pReorderableRowHandle></span>
                                             </td>
-                                            <td style="min-width: 16rem">{{ rowData.taskTitle }}</td>
+                                            <td style="min-width: 16rem">{{ rowData.title }}</td>
                                             <td style="min-width: 12rem">{{ rowData.dueDate | date : 'dd MMM, yyyy'}}
                                             </td>
-                                            <td style="min-width: 12rem"> <p-tag [value]="rowData.mstStatus.name" /> </td>
-                                            <td>{{ rowData.mstCategory.name }}</td>
+                                            <td style="min-width: 12rem">
+                                                <p-menu #inProgressStatusUpdateMenu [model]="taskStatusUpdateMenuItems"
+                                                    [popup]="true" appendTo="body" />
+                                                <p-button
+                                                    (click)="openMenu($event, rowData, inProgressStatusUpdateMenu)"
+                                                    variant="text" [label]="rowData.status" size="small"
+                                                    class="statusBtnInTable" />
+                                            </td>
+                                            <td>{{ rowData.category }}</td>
                                             <td>
-                                                <p-menu #inProgressMenu [model]="editMenuItems" [popup]="true" appendTo="body" />
-                                                <p-button (click)="openMenu($event, rowData, inProgressMenu)" variant="text"
-                                                    icon="pi pi-ellipsis-v" />
+                                                <p-menu #inProgressMenu [model]="editMenuItems" [popup]="true"
+                                                    appendTo="body" />
+                                                <p-button (click)="openMenu($event, rowData, inProgressMenu)"
+                                                    variant="text" icon="pi pi-ellipsis-v" />
                                             </td>
                                         </tr>
                                     </ng-template>
@@ -368,7 +378,8 @@
                         <p-accordion-content>
                             <div *ngIf="completedData.length;else:emptyInProgress">
                                 <p-table [value]="completedData" size="small" [columns]="todoCols"
-                                    [reorderableColumns]="true" [tableStyle]="{'min-width': '50rem'}">
+                                    [reorderableColumns]="true" [tableStyle]="{'min-width': '50rem'}"
+                                    [(selection)]="selectedRows">
                                     <ng-template #header let-columns>
                                         <tr>
                                             <th style="width: 2rem">
@@ -399,15 +410,23 @@
                                             <td>
                                                 <span class="pi pi-bars" pReorderableRowHandle></span>
                                             </td>
-                                            <td style="min-width: 16rem">{{ rowData.taskTitle }}</td>
+                                            <td style="min-width: 16rem" class="text-decoration-line-through">{{ rowData.title }}</td>
                                             <td style="min-width: 12rem">{{ rowData.dueDate | date : 'dd MMM, yyyy'}}
                                             </td>
-                                            <td style="min-width: 12rem"> <p-tag [value]="rowData.mstStatus.name" /> </td>
-                                            <td>{{ rowData.mstCategory.name }}</td>
+                                            <td style="min-width: 12rem">
+                                                <p-menu #completedStatusUpdateMenu [model]="taskStatusUpdateMenuItems"
+                                                    [popup]="true" appendTo="body" />
+                                                <p-button (click)="openMenu($event, rowData, completedStatusUpdateMenu)"
+                                                    variant="text" [label]="rowData.status" size="small"
+                                                    class="statusBtnInTable" />
+                                                <!-- <p-tag [value]="rowData.status" />  -->
+                                            </td>
+                                            <td>{{ rowData.category }}</td>
                                             <td>
-                                                <p-menu #completedMenu [model]="editMenuItems" [popup]="true" appendTo="body" />
-                                                <p-button (click)="openMenu($event, rowData, completedMenu)" variant="text"
-                                                    icon="pi pi-ellipsis-v" />
+                                                <p-menu #completedMenu [model]="editMenuItems" [popup]="true"
+                                                    appendTo="body" />
+                                                <p-button (click)="openMenu($event, rowData, completedMenu)"
+                                                    variant="text" icon="pi pi-ellipsis-v" />
                                             </td>
                                         </tr>
                                     </ng-template>
@@ -432,12 +451,12 @@
                                 <p-panel class="example-box mb-2" cdkDrag>
                                     <ng-template #header>
                                         <div class="flex items-center gap-2">
-                                            <span class="font-bold">{{item.taskTitle}}</span>
+                                            <span class="fw-semibold">{{item.title}}</span>
                                         </div>
                                     </ng-template>
                                     <ng-template #footer>
                                         <div class="d-flex justify-content-between">
-                                            <p>{{item.mstCategory.name}}</p>
+                                            <p>{{item.category}}</p>
                                             <p class="text-surface-500 dark:text-surface-400">{{item.dueDate | date:'dd MMM, yyyy'}}</p>
                                         </div>
                                     </ng-template>
@@ -450,31 +469,36 @@
                                 </p-panel>
                             </ng-container>
                         </div>
-                        <ng-template #boardEmptyTodo class="text-center p-5">No Tasks in To-Do</ng-template>
+                        <ng-template #boardEmptyTodo>
+                            <div class="text-center p-5">
+                                No Tasks in To-Do
+                            </div>
+                        </ng-template>
                     </div>
                     <div class="board-card">
                         <div class="ms-2 mt-2 mb-2">
                             <p-tag value="IN-PROGRESS" class="inProgressTag" />
                         </div>
-                        <div *ngIf="inProgressData.length;else:boardEmptyInProgress" class="board-tasks mx-2">
+                        <div *ngIf="inProgressData.length;else:boardEmptyInProgress" class="example-list mx-2"
+                            cdkDropList (cdkDropListDropped)="drop(inProgressData, $event)">
                             <ng-container *ngFor="let item of inProgressData">
-                                <p-panel>
+                                <p-panel class="example-box mb-2" cdkDrag>
                                     <ng-template #header>
                                         <div class="flex items-center gap-2">
-                                            <span class="font-bold">{{item.taskTitle}}</span>
+                                            <span class="fw-semibold">{{item.title}}</span>
                                         </div>
                                     </ng-template>
                                     <ng-template #footer>
                                         <div class="d-flex justify-content-between">
-                                            <p>{{item.mstCategory.name}}</p>
+                                            <p>{{item.category}}</p>
                                             <p class="text-surface-500 dark:text-surface-400">{{item.dueDate | date:'dd MMM, yyyy'}}</p>
                                         </div>
                                     </ng-template>
                                     <ng-template #icons>
                                         <p-button icon="pi pi-ellipsis-h" severity="secondary" rounded text
                                             (click)="openMenu($event, item, inProgressBoardMenu)" />
-                                        <p-menu #inProgressBoardMenu id="config_menu" [model]="editMenuItems" appendTo="body"
-                                            [popup]="true" />
+                                        <p-menu #inProgressBoardMenu id="config_menu" [model]="editMenuItems"
+                                            appendTo="body" [popup]="true" />
                                     </ng-template>
                                 </p-panel>
                             </ng-container>
@@ -489,25 +513,26 @@
                         <div class="ms-2 mt-2 mb-2">
                             <p-tag value="COMPLETED" class="completedTag" />
                         </div>
-                        <div *ngIf="completedData.length;else:boardEmptyCompleted" class="board-tasks mx-2">
+                        <div *ngIf="completedData.length;else:boardEmptyCompleted" class="example-list mx-2" cdkDropList
+                            (cdkDropListDropped)="drop(completedData, $event)">
                             <ng-container *ngFor="let item of completedData">
-                                <p-panel>
+                                <p-panel class="example-box mb-2" cdkDrag>
                                     <ng-template #header>
                                         <div class="flex items-center gap-2">
-                                            <span class="font-bold">{{item.taskTitle}}</span>
+                                            <span class="fw-semibold text-decoration-line-through">{{item.title}}</span>
                                         </div>
                                     </ng-template>
                                     <ng-template #footer>
                                         <div class="d-flex justify-content-between">
-                                            <p>{{item.mstCategory.name}}</p>
+                                            <p>{{item.category}}</p>
                                             <p class="text-surface-500 dark:text-surface-400">{{item.dueDate | date:'dd MMM, yyyy'}}</p>
                                         </div>
                                     </ng-template>
                                     <ng-template #icons>
                                         <p-button icon="pi pi-ellipsis-h" severity="secondary" rounded text
                                             (click)="openMenu($event, item, completedBoardMenu)" />
-                                        <p-menu #completedBoardMenu id="config_menu" [model]="editMenuItems" appendTo="body"
-                                            [popup]="true" />
+                                        <p-menu #completedBoardMenu id="config_menu" [model]="editMenuItems"
+                                            appendTo="body" [popup]="true" />
                                     </ng-template>
                                 </p-panel>
                             </ng-container>
@@ -529,7 +554,7 @@
     [style]="{ width: '75vw' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
     <div class="row mt-3 mx-2">
         <form [formGroup]="addTask" class="col-12 col-sm-12 col-md-8 col-lg-8">
-            <input type="text" class="w-100 mb-2" placeholder="Task Title" pInputText formControlName="taskTitle" />
+            <input type="text" class="w-100 mb-2" placeholder="Task Title" pInputText formControlName="title" />
             <p-editor formControlName="description" placeholder="Description" [style]="{ height: '80px' }">
                 <ng-template #header>
                     <div class="d-flex justify-content-between">
@@ -562,8 +587,7 @@
             <div class="row my-2">
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                     <label for="category" class="label">Task Category</label><br>
-                    <p-selectbutton inputId="category" size="small"
-                        [options]="categoryDropDown"
+                    <p-selectbutton inputId="category" size="small" [options]="categoryDropDown"
                         formControlName="category" optionLabel="name" aria-labelledby="basic" />
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
@@ -575,8 +599,8 @@
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                     <label for="status" class="label">Task Status</label><br>
-                    <p-select class="w-100" [options]="statusDropDown" size="small"
-                        formControlName="status" optionLabel="name" placeholder="Choose" />
+                    <p-select class="w-100" [options]="statusDropDown" size="small" formControlName="status"
+                        optionLabel="name" placeholder="Choose" />
                 </div>
             </div>
             <label class="ms-1">Attachment</label>
@@ -595,12 +619,35 @@
         </form>
         <div class="activity-section col-12 col-sm-12 col-md-4 col-lg-4">
             <p class="activity-heading">Activity</p>
+            <div class="activity-content">
+                
+            </div>
         </div>
     </div>
-    <footer class="addTaskFooter text-end mt-2 py-3 px-4">
-        <p-button size="small" rounded="true"  (onClick)="clearAllValues()"
-            class="addTaskCancelBtn">CANCEL</p-button>
-        <p-button size="small" rounded="true"  (onClick)="submit()"
-            class="addTaskCreateBtn">UPDATE</p-button>
-    </footer>
+    <ng-template #footer class="addTaskFooter text-end mt-2 py-3 px-4">
+        <p-button size="small" rounded="true" (onClick)="clearAllValues()" class="addTaskCancelBtn">CANCEL</p-button>
+        <p-button size="small" rounded="true" (onClick)="submit('edit')" class="addTaskCreateBtn">UPDATE</p-button>
+    </ng-template>
+    <!-- <footer class="addTaskFooter text-end mt-2 py-3 px-4">
+        <p-button size="small" rounded="true" (onClick)="clearAllValues()" class="addTaskCancelBtn">CANCEL</p-button>
+        <p-button size="small" rounded="true" (onClick)="submit('edit')" class="addTaskCreateBtn">UPDATE</p-button>
+    </footer> -->
 </p-dialog>
+
+<!-- ----- Multi Status Update and Delete ----- -->
+
+@if (selectedRows.length) {
+    <div class="multiSelectContainer row">
+        <div class="col text-start">
+            <p-chip [label]="selectedRows.length+' Tasks Selected'" [removable]="true" 
+            (click)="selectedRows = []" class="multiSelectChip"/>
+        </div>
+        <div class="col text-end">
+            <p-menu #multiStatusUpdateMenu [model]="multiStatusUpdateMenuItems" [popup]="true" appendTo="body" />
+            <p-button class="multiSelectStatusBtn me-2" variant="text" label="Status" rounded="true" variant="outlined"
+            (click)="openMultiStatusMenu($event, multiStatusUpdateMenu)"  />
+            <p-button class="multiSelectDeleteBtn" label="Delete" rounded="true" severity="danger" variant="outlined"
+            (click)="deleteTask(selectedRows)" />
+        </div>
+    </div>
+}
