@@ -30,6 +30,7 @@ export class LandingComponent implements OnInit, OnDestroy {
   layout: any = 'list';
   showTodoAddTask = false;
   selectedTask: any = {};
+  activities:any[]=[];
   selectedDate: Date | null = null;
   showAddDate = false;
   // isStatusListOpened = false;
@@ -380,7 +381,7 @@ export class LandingComponent implements OnInit, OnDestroy {
     this.addTask.reset();
     this.isStatusSelected = false;
     this.isCategorySelected = false;
-    // this.documents().clear();
+    this.documents().clear();
     // this.uploadedFiles = [];
   }
 
@@ -448,12 +449,10 @@ export class LandingComponent implements OnInit, OnDestroy {
 
   submit(action: String) {
     var task = this.addTask.value;
-    console.log(task);
     if (this.addTask.valid) {
       task.status = task.status.name;
       task.category = task.category.name;
       task.dueDate = new Date(this.formatUTCDate(task.dueDate));
-      console.log(task);
       if (action == 'save') {
         this.apiService.post(task, 'Task/AddTask').subscribe({
           next: (data: any) => {
@@ -470,10 +469,12 @@ export class LandingComponent implements OnInit, OnDestroy {
               this.getTasks();
             }
             else {
+              this.addTaskDialogVisible = true;
               this.messageService.add({ severity: 'warn', summary: data.message });
             }
           },
           error: (err: any) => {
+            this.addTaskDialogVisible = true;
             this.messageService.add({ severity: 'error', summary: err.error.message });
           }
         });
@@ -493,10 +494,12 @@ export class LandingComponent implements OnInit, OnDestroy {
               this.getTasks();
             }
             else {
+              this.editTaskDialogVisible = true;
               this.messageService.add({ severity: 'warn', summary: data.message });
             }
           },
           error: (err: any) => {
+            this.editTaskDialogVisible = true;
             this.messageService.add({ severity: 'error', summary: err.error.message });
           }
         });
@@ -511,8 +514,6 @@ export class LandingComponent implements OnInit, OnDestroy {
       else if (task.status.value == 'completed') {
         this.completedData.push(task);
       }
-      this.addTaskDialogVisible = false;
-      this.editTaskDialogVisible = false;
     }
   }
 
@@ -562,10 +563,28 @@ export class LandingComponent implements OnInit, OnDestroy {
         this.messageService.add({ severity: 'error', detail: err.error.result, summary: err.error.message });
       }
     })
+    this.getActivities(data.id);
     // Manually trigger value change for Quill Editor
     setTimeout(() => {
       this.addTask.get('description')?.setValue(data.description || '');
     }, 0);
+  }
+
+  getActivities(taskId:any){
+    this.apiService.get(`Task/GetActivities?taskId=${taskId}`).subscribe({
+      next: (data: any) => {
+        if (data.result == 'Success') {
+          this.activities = data.data;
+        }
+        else{
+          this.activities = [];
+        }
+      },
+      error: (err: any) => {
+        this.activities = [];
+        this.messageService.add({ severity: 'error', detail: err.error.result, summary: err.error.message });
+      }
+    })
   }
 
   deleteTask(data: any) {

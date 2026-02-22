@@ -294,6 +294,11 @@ tr {
     font-weight: 500;
 }
 
+.activities{
+    font-size: 11px;
+    padding-bottom: 1rem;
+    align-content: start
+}
 /* ::ng-deep .addDateBtn .p-button , ::ng-deep .openListBtn .p-button{
     color: #334155 !important;
     border-color: #334155 !important;

@@ -620,7 +620,14 @@
         <div class="activity-section col-12 col-sm-12 col-md-4 col-lg-4">
             <p class="activity-heading">Activity</p>
             <div class="activity-content">
-                
+                <table class="table-responsive">
+                    @for (activity of activities; track activity) {
+                        <tr>
+                            <td class="activities px-2" style="width: 65%;">{{activity.activity}}</td>
+                            <td class="activities" style="width: 45%;">{{activity.date}} at {{activity.time}}</td>
+                        </tr>
+                    }
+                </table>
             </div>
         </div>
     </div>
